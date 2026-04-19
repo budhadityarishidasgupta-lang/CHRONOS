@@ -1,0 +1,7 @@
+anthropic>=0.96.0
+python-dotenv
+rich
+click
+bandit
+safety
+pygithub
