@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-shadow.py - Shadow Swarm v4.4: High-Speed Hybrid Predator.
+shadow.py - CHRONOS repo review runner.
 """
 
 import asyncio
@@ -25,7 +25,7 @@ load_dotenv()
 
 
 class ShadowPredator:
-    def __init__(self, target: str):
+    def __init__(self, target: str, max_files: int = 50):
         target_path = Path(target).resolve()
         self.target_dir = target_path if target_path.is_dir() else target_path.parent
         self.target_file = target_path if target_path.is_file() else None
@@ -35,7 +35,7 @@ class ShadowPredator:
         self.findings = []
         self.logs = []
         self.current_status = "Initializing..."
-        self.max_ai_audit_files = 50
+        self.max_ai_audit_files = max_files
         self.semaphore = None
 
     def add_log(self, msg: str):
@@ -164,6 +164,9 @@ class ShadowPredator:
 
     async def run_audit(self):
         """Main async audit loop."""
+        if not self.target_dir.exists():
+            raise click.ClickException(f"Target path does not exist: {self.target_dir}")
+
         self.semaphore = asyncio.Semaphore(5)
 
         layout = Layout()
@@ -173,6 +176,7 @@ class ShadowPredator:
         )
 
         with Live(layout, refresh_per_second=4):
+            self.add_log(f"Review target: {self.target_dir}")
             self.run_security_guidance_hook()
             self.current_status = "Phase 1: Deep brain parallel recon..."
 
@@ -204,7 +208,7 @@ class ShadowPredator:
 
     def generate_table(self) -> Table:
         table = Table(
-            title=f"SHADOW SWARM: {self.current_status}",
+            title=f"CHRONOS REPO REVIEW: {self.current_status}",
             show_header=True,
             header_style="bold red",
         )
@@ -226,13 +230,14 @@ class ShadowPredator:
 
     def generate_log_panel(self) -> Panel:
         log_text = Text.from_markup("\n".join(self.logs))
-        return Panel(log_text, title="PREDATOR FEED", border_style="dim")
+        return Panel(log_text, title="REVIEW FEED", border_style="dim")
 
 
 @click.command()
 @click.option("--target", "-t", default=".", help="Directory or file to scan")
-def main(target):
-    predator = ShadowPredator(target)
+@click.option("--max-files", default=50, show_default=True, type=int, help="Maximum files to send to AI review")
+def main(target, max_files):
+    predator = ShadowPredator(target, max_files=max_files)
     asyncio.run(predator.run_audit())
 
 

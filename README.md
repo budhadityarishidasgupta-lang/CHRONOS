@@ -1,12 +1,19 @@
-# Code Sentinel Audit
+# CHRONOS
 
-Code Sentinel Audit is a security-audit prototype that combines:
+CHRONOS is a repo-review assistant for your local codebases. It combines:
 
 - regex-based detection of risky code patterns
 - Anthropic-powered file review for higher-level security issues
 - optional Claude CLI follow-up to try to verify serious findings
 
-It is best treated as an experimental assistant for auditing your own codebases.
+It is best treated as an experimental reviewer for your own repositories, especially when you want a quick security-focused pass before or after changes.
+
+## Best Use Cases
+
+- review one of your own repos before pushing a branch
+- run a quick security-oriented sweep on a newly cloned project
+- inspect Python, JavaScript, or TypeScript code for risky patterns
+- create a lightweight first-pass report before manual review
 
 ## What It Can Do
 
@@ -57,7 +64,68 @@ ANTHROPIC_ORG_ID=your_org_or_project_id
 CLAUDE_BIN=claude
 ```
 
-## Usage
+## Review Another Repo
+
+This is the normal step-by-step workflow for using CHRONOS on one of your existing repos.
+
+### 1. Keep CHRONOS in its own folder
+
+Example local layout:
+
+```text
+C:\Projects\CHRONOS
+C:\Projects\my-other-repo
+```
+
+### 2. Set up CHRONOS
+
+From the CHRONOS folder:
+
+```powershell
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+### 3. Add your credentials
+
+Copy `.env.example` to `.env`, then set:
+
+- `ANTHROPIC_API_KEY`
+- optional `ANTHROPIC_ORG_ID`
+- optional `CLAUDE_BIN`
+
+### 4. Point CHRONOS at the repo you want to review
+
+Windows example:
+
+```powershell
+py shadow.py --target C:\path\to\your\repo
+```
+
+Single-file example:
+
+```powershell
+py shadow.py --target C:\path\to\your\repo\app\main.py
+```
+
+### 5. Read the findings in order
+
+- `HOOK` means a concrete risky pattern matched
+- `AI-BRAIN` means the model thinks there may be a vulnerability or design issue
+- `POC-PROVEN` means the Claude CLI returned a proof-style result
+- `CLI-ERROR` means the Claude CLI step was unavailable or failed
+
+### 6. Fix, rerun, compare
+
+Use CHRONOS as a repeated pass:
+
+1. run review
+2. inspect findings
+3. patch your repo
+4. rerun review
+
+## CLI Usage
 
 Scan a directory:
 
@@ -69,6 +137,12 @@ Scan a single file:
 
 ```bash
 python shadow.py --target app/main.py
+```
+
+Review fewer files during a quick pass:
+
+```bash
+python shadow.py --target path/to/project --max-files 20
 ```
 
 On Windows, if `python` is not on your `PATH`, use:
@@ -91,13 +165,19 @@ On Windows:
 py -m unittest discover -s tests
 ```
 
-## Suggested Workflow
+## Suggested Review Workflow
 
-1. Run a scan against a local project you own.
+1. Run CHRONOS against a local project you own.
 2. Review `HOOK` findings first because they identify concrete risky patterns.
 3. Review `AI-BRAIN` findings for architecture or logic issues.
 4. Treat `POC-PROVEN` output as a lead to validate manually, not final truth.
 5. Fix confirmed issues and rerun the scan.
+
+## Important Boundaries
+
+- CHRONOS is strongest as a repo-review helper, not a final security authority.
+- It currently focuses on Python, JavaScript, and TypeScript source files.
+- It does not replace manual review, tests, or formal security assessment.
 
 ## License
 
