@@ -1,0 +1,8 @@
+.env
+venv/
+__pycache__/
+*.pyc
+audit_target/
+scratch/
+exploit_lab/
+.DS_Store

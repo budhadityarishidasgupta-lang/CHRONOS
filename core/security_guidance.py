@@ -21,7 +21,18 @@ DANGEROUS_PATTERNS = {
         r"eval\(",
         r"new Function\(",
         r"child_process\.exec\(",
+        r"child_process\.execSync\(",
+        r"child_process\.spawn\(.*shell: true",
+        r"setTimeout\(.*['\"].*['\"]", # String execution in setTimeout
         r"innerHTML\s*=", # Potential XSS
+    ],
+    "typescript": [
+        r"eval\(",
+        r"new Function\(",
+        r"child_process\.exec\(",
+        r"child_process\.execSync\(",
+        r"dangerouslySetInnerHTML",
+        r"as any", # Highlighting unsafe type casting which can hide logic leaks
     ]
 }
 

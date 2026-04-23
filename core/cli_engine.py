@@ -29,8 +29,8 @@ class ClaudeCLIPredator:
         cmd = [
             self.claude_bin,
             "--print",
+            "--verbose",
             "--dangerously-skip-permissions",
-            "--effort", "high",
             "--output-format", "stream-json",
             task
         ]
@@ -48,13 +48,18 @@ class ClaudeCLIPredator:
         try:
             for line in iter(process.stdout.readline, ""):
                 if not line: break
+                raw_line = line.strip()
+                if not raw_line: continue
+                
                 try:
-                    data = json.loads(line)
+                    data = json.loads(raw_line)
                     if on_data:
                         on_data(data)
                 except json.JSONDecodeError:
-                    # Handle raw text or partial lines if any
-                    pass
+                    # If it's not JSON, it's likely an error message or a progress log
+                    if "error" in raw_line.lower() or "not found" in raw_line.lower():
+                        if on_data:
+                            on_data({"type": "error", "message": raw_line})
             process.wait()
         except KeyboardInterrupt:
             process.terminate()
