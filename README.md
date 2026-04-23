@@ -1,6 +1,6 @@
 # Code Sentinel Audit
 
-Shadow Swarm is a security-audit prototype that combines:
+Code Sentinel Audit is a security-audit prototype that combines:
 
 - regex-based detection of risky code patterns
 - Anthropic-powered file review for higher-level security issues
